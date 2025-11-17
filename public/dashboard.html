@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Air Quality Monitor</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>🌍 Air Quality Dashboard</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="userName" class="user-name">Welcome, User</span>
+                <button id="adminBtn" class="btn btn-secondary" style="display: none;">Admin Panel</button>
+                <button id="logoutBtn" class="btn btn-danger">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <div class="card-icon">🌡️</div>
+                <div class="card-content">
+                    <h3>Temperature</h3>
+                    <p id="tempValue" class="card-value">--</p>
+                    <span class="card-unit">°C</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">💧</div>
+                <div class="card-content">
+                    <h3>Humidity</h3>
+                    <p id="humidityValue" class="card-value">--</p>
+                    <span class="card-unit">%</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">🌫️</div>
+                <div class="card-content">
+                    <h3>PM2.5</h3>
+                    <p id="pm25Value" class="card-value">--</p>
+                    <span class="card-unit">μg/m³</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">☁️</div>
+                <div class="card-content">
+                    <h3>PM10</h3>
+                    <p id="pm10Value" class="card-value">--</p>
+                    <span class="card-unit">μg/m³</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">💨</div>
+                <div class="card-content">
+                    <h3>CO2</h3>
+                    <p id="co2Value" class="card-value">--</p>
+                    <span class="card-unit">ppm</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Temperature & Humidity Trends</h3>
+                <canvas id="tempHumidityChart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Particulate Matter (PM2.5 & PM10)</h3>
+                <canvas id="pmChart"></canvas>
+            </div>
+            
+            <div class="chart-container full-width">
+                <h3>CO2 Levels</h3>
+                <canvas id="co2Chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <h3>Recent Sensor Readings</h3>
+            <div class="table-responsive">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Temperature (°C)</th>
+                            <th>Humidity (%)</th>
+                            <th>PM2.5 (μg/m³)</th>
+                            <th>PM10 (μg/m³)</th>
+                            <th>CO2 (ppm)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Last Updated -->
+        <div class="footer-info">
+            <p>Last updated: <span id="lastUpdate">--</span></p>
+            <p>Auto-refresh every 30 seconds</p>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
