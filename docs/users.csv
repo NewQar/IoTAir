@@ -1,0 +1,4 @@
+name,email,password,role
+Admin User,admin@example.com,$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa,admin
+John Doe,john@example.com,$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa,user
+Jane Smith,jane@example.com,$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa,user

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Air Quality Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: #1e293b;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-brand h2 {
+            font-size: 22px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            font-size: 36px;
+        }
+
+        .card-content h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            display: inline;
+        }
+
+        .card-unit {
+            font-size: 14px;
+            color: #64748b;
+            margin-left: 5px;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            padding: 0 30px 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-container h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #1e293b;
+        }
+
+        /* Table Section */
+        .table-section {
+            padding: 0 30px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .table-section h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .table-responsive {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f1f5f9;
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 12px;
+            font-size: 14px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Footer Info */
+        .footer-info {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .summary-section,
+            .charts-section {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+            
+            .table-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>🌍 Air Quality Dashboard</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="userName" class="user-name">Welcome, User</span>
+                <button id="adminBtn" class="btn btn-secondary" style="display: none;">Admin Panel</button>
+                <button id="logoutBtn" class="btn btn-danger">Logout</button>
+            </div>
+        </nav>
+
+        <!-- Summary Cards -->
+        <div class="summary-section">
+            <div class="summary-card">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Field 1</h3>
+                    <p id="field1Value" class="card-value">--</p>
+                    <span class="card-unit">units</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <h3>Field 2</h3>
+                    <p id="field2Value" class="card-value">--</p>
+                    <span class="card-unit">units</span>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="card-icon">📉</div>
+                <div class="card-content">
+                    <h3>Field 3</h3>
+                    <p id="field3Value" class="card-value">--</p>
+                    <span class="card-unit">units</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Field 1 & Field 2 Trends</h3>
+                <canvas id="field12Chart"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>Field 3 Trend</h3>
+                <canvas id="field3Chart"></canvas>
+            </div>
+            
+            <div class="chart-container full-width">
+                <h3>All Fields Combined</h3>
+                <canvas id="combinedChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-section">
+            <h3>Recent Sensor Readings</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Entry ID</th>
+                            <th>Field 1</th>
+                            <th>Field 2</th>
+                            <th>Field 3</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px;">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer-info">
+            <p>Last updated: <span id="lastUpdate">--</span></p>
+            <p>Auto-refresh every 30 seconds</p>
+        </div>
+    </div>
+
+    <script>
+        let charts = {};
+        let allData = [];
+        let refreshInterval;
+
+        // Check if user is logged in
+        function checkAuth() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            const user = JSON.parse(currentUser);
+            
+            // Update UI with user info
+            document.getElementById('userName').textContent = `Welcome, ${user.name}`;
+            
+            // Show admin button if user is admin
+            if (user.role === 'admin') {
+                document.getElementById('adminBtn').style.display = 'inline-block';
+            }
+            
+            return user;
+        }
+
+        // Load sensor data from CSV
+        async function loadData() {
+            try {
+                const response = await fetch('feeds.csv');
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        allData = results.data.map(row => ({
+                            timestamp: row.created_at,
+                            entry_id: row.entry_id,
+                            field1: parseFloat(row.field1) || 0,
+                            field2: parseFloat(row.field2) || 0,
+                            field3: parseFloat(row.field3) || 0
+                        }));
+                        
+                        updateDashboard();
+                        document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+                    },
+                    error: function(error) {
+                        console.error('Error parsing CSV:', error);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Update all dashboard components
+        function updateDashboard() {
+            if (allData.length === 0) return;
+            
+            updateSummaryCards();
+            updateCharts();
+            updateTable();
+        }
+
+        // Update summary cards
+        function updateSummaryCards() {
+            const latest = allData[allData.length - 1];
+            
+            document.getElementById('field1Value').textContent = latest.field1.toFixed(2);
+            document.getElementById('field2Value').textContent = latest.field2.toFixed(2);
+            document.getElementById('field3Value').textContent = latest.field3.toFixed(2);
+        }
+
+        // Update charts
+        function updateCharts() {
+            const last20 = allData.slice(-20);
+            const timestamps = last20.map(d => {
+                const date = new Date(d.timestamp);
+                return date.toLocaleTimeString();
+            });
+            
+            // Field 1 & 2 Chart
+            updateOrCreateChart('field12Chart', {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [
+                        {
+                            label: 'Field 1',
+                            data: last20.map(d => d.field1),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Field 2',
+                            data: last20.map(d => d.field2),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: false } }
+                }
+            });
+            
+            // Field 3 Chart
+            updateOrCreateChart('field3Chart', {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [{
+                        label: 'Field 3',
+                        data: last20.map(d => d.field3),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            // Combined Chart
+            updateOrCreateChart('combinedChart', {
+                type: 'line',
+                data: {
+                    labels: timestamps,
+                    datasets: [
+                        {
+                            label: 'Field 1',
+                            data: last20.map(d => d.field1),
+                            borderColor: '#ef4444',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Field 2',
+                            data: last20.map(d => d.field2),
+                            borderColor: '#3b82f6',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Field 3',
+                            data: last20.map(d => d.field3),
+                            borderColor: '#10b981',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { position: 'top' } }
+                }
+            });
+        }
+
+        // Helper to create or update chart
+        function updateOrCreateChart(canvasId, config) {
+            if (charts[canvasId]) {
+                charts[canvasId].data = config.data;
+                charts[canvasId].update();
+            } else {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                charts[canvasId] = new Chart(ctx, config);
+            }
+        }
+
+        // Update table
+        function updateTable() {
+            const last10 = allData.slice(-10).reverse();
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            last10.forEach(row => {
+                const tr = document.createElement('tr');
+                const date = new Date(row.timestamp);
+                tr.innerHTML = `
+                    <td>${date.toLocaleString()}</td>
+                    <td>${row.entry_id}</td>
+                    <td>${row.field1.toFixed(2)}</td>
+                    <td>${row.field2.toFixed(2)}</td>
+                    <td>${row.field3.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        });
+
+        // Admin button
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            window.location.href = 'admin.html';
+        });
+
+        // Initialize
+        const user = checkAuth();
+        if (user) {
+            loadData();
+            // Auto-refresh every 30 seconds
+            refreshInterval = setInterval(loadData, 30000);
+        }
+    </script>
+</body>
+</html>
