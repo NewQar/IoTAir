@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Air Quality Dashboard</title>
+    <title>Daftar - Sistem Pemantauan Kualiti Udara</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -151,48 +151,44 @@
 <body>
     <div class="auth-card">
         <div class="auth-header">
-            <h1>🌍 Air Quality Monitor</h1>
-            <p>Create your account</p>
-        </div>
-
-        <div class="warning-info">
-            ⚠️ Note: In static mode, registration is simulated. Users won't be saved to the CSV file permanently. Use the demo accounts for testing.
+            <h1>Sistem Pemantauan Kualiti Udara</h1>
+            <p>Cipta akaun anda</p>
         </div>
         
         <form id="registerForm">
             <div class="form-group">
-                <label for="name">Full Name</label>
+                <label for="name">Nama Penuh</label>
                 <input type="text" id="name" required placeholder="John Doe">
             </div>
             
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="your@email.com">
+                <label for="email">Alamat E-mel</label>
+                <input type="email" id="email" required placeholder="anda@email.com">
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Min. 6 characters" minlength="6">
+                <label for="password">Kata Laluan</label>
+                <input type="password" id="password" required placeholder="Sekurang-kurangnya 6 aksara" minlength="6">
             </div>
             
             <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" required placeholder="Re-enter password">
+                <label for="confirmPassword">Sahkan Kata Laluan</label>
+                <input type="password" id="confirmPassword" required placeholder="Masukkan semula kata laluan">
             </div>
             
             <div id="errorMessage" class="error-message"></div>
             <div id="successMessage" class="success-message"></div>
             
-            <button type="submit" class="btn">Register</button>
+            <button type="submit" class="btn">Daftar</button>
         </form>
         
         <div class="auth-footer">
-            <p>Already have an account? <a href="login.html">Login here</a></p>
+            <p>Sudah ada akaun? <a href="login.html">Log masuk di sini</a></p>
         </div>
     </div>
 
     <script>
-        // Load users from CSV
+        // Muat pengguna dari CSV
         async function loadUsers() {
             try {
                 const response = await fetch('users.csv');
@@ -207,12 +203,12 @@
                     });
                 });
             } catch (error) {
-                console.error('Error loading users:', error);
+                console.error('Ralat memuat pengguna:', error);
                 return [];
             }
         }
 
-        // Handle registration
+        // Pengendalian pendaftaran
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -228,53 +224,53 @@
             successDiv.textContent = '';
             successDiv.classList.remove('show');
             
-            // Validate passwords match
+            // Semak kata laluan sama
             if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match!';
+                errorDiv.textContent = 'Kata laluan tidak sepadan!';
                 errorDiv.classList.add('show');
                 return;
             }
             
             if (password.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters long.';
+                errorDiv.textContent = 'Kata laluan mesti sekurang-kurangnya 6 aksara.';
                 errorDiv.classList.add('show');
                 return;
             }
             
             try {
-                // Load existing users
+                // Muat pengguna sedia ada
                 const users = await loadUsers();
                 
-                // Check if email already exists
+                // Semak jika e-mel sudah berdaftar
                 if (users.some(u => u.email === email)) {
-                    errorDiv.textContent = 'Email already registered. Please login instead.';
+                    errorDiv.textContent = 'E-mel sudah berdaftar. Sila log masuk sebagai ganti.';
                     errorDiv.classList.add('show');
                     return;
                 }
                 
-                // Simulate successful registration
-                // Note: In static mode, we can't actually save to CSV
-                // But we can store temporarily in localStorage
+                // Simulasi pendaftaran berjaya
+                // Nota: Dalam mod statik, kita tidak boleh simpan ke CSV
+                // Tetapi boleh simpan sementara dalam localStorage
                 const tempUsers = JSON.parse(localStorage.getItem('tempUsers') || '[]');
                 tempUsers.push({
                     name,
                     email,
-                    password, // In production, this should be hashed
+                    password, // Dalam produksi, ini sepatutnya di-hash
                     role: 'user'
                 });
                 localStorage.setItem('tempUsers', JSON.stringify(tempUsers));
                 
-                successDiv.textContent = 'Registration successful! Redirecting to login...';
+                successDiv.textContent = 'Pendaftaran berjaya! Mengalihkan ke halaman log masuk...';
                 successDiv.classList.add('show');
                 
-                // Redirect to login after 2 seconds
+                // Alih ke log masuk selepas 2 saat
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 2000);
                 
             } catch (error) {
-                console.error('Registration error:', error);
-                errorDiv.textContent = 'Network error. Please try again.';
+                console.error('Ralat pendaftaran:', error);
+                errorDiv.textContent = 'Ralat rangkaian. Sila cuba sekali lagi.';
                 errorDiv.classList.add('show');
             }
         });
