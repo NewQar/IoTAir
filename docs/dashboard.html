@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Air Quality Monitor</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <title>Papan Pemuka - Pemantau Kualiti Udara</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -129,33 +128,6 @@
             margin-left: 5px;
         }
 
-        /* Charts Section */
-        .charts-section {
-            padding: 0 30px 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart-container.full-width {
-            grid-column: 1 / -1;
-        }
-
-        .chart-container h3 {
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: #1e293b;
-        }
-
         /* Table Section */
         .table-section {
             padding: 0 30px 30px;
@@ -219,8 +191,7 @@
                 gap: 15px;
             }
             
-            .summary-section,
-            .charts-section {
+            .summary-section {
                 grid-template-columns: 1fr;
                 padding: 15px;
             }
@@ -236,80 +207,62 @@
         <!-- Navigation Bar -->
         <nav class="navbar">
             <div class="nav-brand">
-                <h2>🌍 Air Quality Dashboard</h2>
+                <h2>🌍 Papan Pemuka Kualiti Udara</h2>
             </div>
             <div class="nav-menu">
-                <span id="userName" class="user-name">Welcome, User</span>
-                <button id="adminBtn" class="btn btn-secondary" style="display: none;">Admin Panel</button>
-                <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                <span id="userName" class="user-name">Selamat datang, Pengguna</span>
+                <button id="adminBtn" class="btn btn-secondary" style="display: none;">Panel Admin</button>
+                <button id="logoutBtn" class="btn btn-danger">Log Keluar</button>
             </div>
         </nav>
 
         <!-- Summary Cards -->
         <div class="summary-section">
             <div class="summary-card">
-                <div class="card-icon">📊</div>
+                <div class="card-icon">🌡️</div>
                 <div class="card-content">
-                    <h3>Field 1</h3>
+                    <h3>Suhu</h3>
                     <p id="field1Value" class="card-value">--</p>
-                    <span class="card-unit">units</span>
+                    <span class="card-unit">°C</span>
                 </div>
             </div>
             
             <div class="summary-card">
-                <div class="card-icon">📈</div>
+                <div class="card-icon">💧</div>
                 <div class="card-content">
-                    <h3>Field 2</h3>
+                    <h3>Kelembapan</h3>
                     <p id="field2Value" class="card-value">--</p>
-                    <span class="card-unit">units</span>
+                    <span class="card-unit">%</span>
                 </div>
             </div>
             
             <div class="summary-card">
-                <div class="card-icon">📉</div>
+                <div class="card-icon">🌫️</div>
                 <div class="card-content">
-                    <h3>Field 3</h3>
+                    <h3>PM2.5</h3>
                     <p id="field3Value" class="card-value">--</p>
-                    <span class="card-unit">units</span>
+                    <span class="card-unit">μg/m³</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-container">
-                <h3>Field 1 & Field 2 Trends</h3>
-                <canvas id="field12Chart"></canvas>
-            </div>
-            
-            <div class="chart-container">
-                <h3>Field 3 Trend</h3>
-                <canvas id="field3Chart"></canvas>
-            </div>
-            
-            <div class="chart-container full-width">
-                <h3>All Fields Combined</h3>
-                <canvas id="combinedChart"></canvas>
             </div>
         </div>
 
         <!-- Data Table -->
         <div class="table-section">
-            <h3>Recent Sensor Readings</h3>
+            <h3>Bacaan Sensor Terkini</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th>Timestamp</th>
-                            <th>Entry ID</th>
-                            <th>Field 1</th>
-                            <th>Field 2</th>
-                            <th>Field 3</th>
+                            <th>Masa</th>
+                            <th>ID Kemasukan</th>
+                            <th>Suhu (°C)</th>
+                            <th>Kelembapan (%)</th>
+                            <th>PM2.5 (μg/m³)</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 40px;">Loading data...</td>
+                            <td colspan="5" style="text-align: center; padding: 40px;">Sedang memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -318,17 +271,16 @@
 
         <!-- Footer -->
         <div class="footer-info">
-            <p>Last updated: <span id="lastUpdate">--</span></p>
-            <p>Auto-refresh every 30 seconds</p>
+            <p>Kemas kini terakhir: <span id="lastUpdate">--</span></p>
+            <p>Auto-muat semula setiap 30 saat</p>
         </div>
     </div>
 
     <script>
-        let charts = {};
         let allData = [];
         let refreshInterval;
 
-        // Check if user is logged in
+        // Semak jika pengguna telah log masuk
         function checkAuth() {
             const currentUser = localStorage.getItem('currentUser');
             if (!currentUser) {
@@ -338,10 +290,10 @@
             
             const user = JSON.parse(currentUser);
             
-            // Update UI with user info
-            document.getElementById('userName').textContent = `Welcome, ${user.name}`;
+            // Kemas kini UI dengan maklumat pengguna
+            document.getElementById('userName').textContent = `Selamat datang, ${user.name}`;
             
-            // Show admin button if user is admin
+            // Tunjuk butang admin jika pengguna ialah admin
             if (user.role === 'admin') {
                 document.getElementById('adminBtn').style.display = 'inline-block';
             }
@@ -349,7 +301,7 @@
             return user;
         }
 
-        // Load sensor data from CSV
+        // Muat data sensor dari CSV
         async function loadData() {
             try {
                 const response = await fetch('feeds.csv');
@@ -362,33 +314,32 @@
                         allData = results.data.map(row => ({
                             timestamp: row.created_at,
                             entry_id: row.entry_id,
-                            field1: parseFloat(row.field1) || 0,
-                            field2: parseFloat(row.field2) || 0,
-                            field3: parseFloat(row.field3) || 0
+                            field1: parseFloat(row.field1) || 0, // Suhu
+                            field2: parseFloat(row.field2) || 0, // Kelembapan
+                            field3: parseFloat(row.field3) || 0  // PM2.5
                         }));
                         
                         updateDashboard();
                         document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
                     },
                     error: function(error) {
-                        console.error('Error parsing CSV:', error);
+                        console.error('Ralat mengurai CSV:', error);
                     }
                 });
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Ralat memuat data:', error);
             }
         }
 
-        // Update all dashboard components
+        // Kemas kini semua komponen papan pemuka
         function updateDashboard() {
             if (allData.length === 0) return;
             
             updateSummaryCards();
-            updateCharts();
             updateTable();
         }
 
-        // Update summary cards
+        // Kemas kini kad ringkasan
         function updateSummaryCards() {
             const latest = allData[allData.length - 1];
             
@@ -397,111 +348,7 @@
             document.getElementById('field3Value').textContent = latest.field3.toFixed(2);
         }
 
-        // Update charts
-        function updateCharts() {
-            const last20 = allData.slice(-20);
-            const timestamps = last20.map(d => {
-                const date = new Date(d.timestamp);
-                return date.toLocaleTimeString();
-            });
-            
-            // Field 1 & 2 Chart
-            updateOrCreateChart('field12Chart', {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Field 1',
-                            data: last20.map(d => d.field1),
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Field 2',
-                            data: last20.map(d => d.field2),
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top' } },
-                    scales: { y: { beginAtZero: false } }
-                }
-            });
-            
-            // Field 3 Chart
-            updateOrCreateChart('field3Chart', {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [{
-                        label: 'Field 3',
-                        data: last20.map(d => d.field3),
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top' } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-            
-            // Combined Chart
-            updateOrCreateChart('combinedChart', {
-                type: 'line',
-                data: {
-                    labels: timestamps,
-                    datasets: [
-                        {
-                            label: 'Field 1',
-                            data: last20.map(d => d.field1),
-                            borderColor: '#ef4444',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Field 2',
-                            data: last20.map(d => d.field2),
-                            borderColor: '#3b82f6',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Field 3',
-                            data: last20.map(d => d.field3),
-                            borderColor: '#10b981',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { position: 'top' } }
-                }
-            });
-        }
-
-        // Helper to create or update chart
-        function updateOrCreateChart(canvasId, config) {
-            if (charts[canvasId]) {
-                charts[canvasId].data = config.data;
-                charts[canvasId].update();
-            } else {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                charts[canvasId] = new Chart(ctx, config);
-            }
-        }
-
-        // Update table
+        // Kemas kini jadual
         function updateTable() {
             const last10 = allData.slice(-10).reverse();
             const tbody = document.getElementById('tableBody');
@@ -521,22 +368,22 @@
             });
         }
 
-        // Logout
+        // Log keluar
         document.getElementById('logoutBtn').addEventListener('click', () => {
             localStorage.removeItem('currentUser');
             window.location.href = 'login.html';
         });
 
-        // Admin button
+        // Butang admin
         document.getElementById('adminBtn').addEventListener('click', () => {
             window.location.href = 'admin.html';
         });
 
-        // Initialize
+        // Inisialisasi
         const user = checkAuth();
         if (user) {
             loadData();
-            // Auto-refresh every 30 seconds
+            // Auto-muat semula setiap 30 saat
             refreshInterval = setInterval(loadData, 30000);
         }
     </script>
