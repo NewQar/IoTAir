@@ -1,9 +1,12 @@
+Here you go, all the text changed to Bahasa Malaysia, including error messages and placeholders:
+
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Air Quality Dashboard</title>
+    <title>Log Masuk - Papan Pemuka Kualiti Udara</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -148,45 +151,45 @@
 <body>
     <div class="auth-card">
         <div class="auth-header">
-            <h1>🌍 Air Quality Monitor</h1>
-            <p>Login to access your dashboard</p>
+            <h1>🌍 Pemantau Kualiti Udara</h1>
+            <p>Log masuk untuk mengakses papan pemuka anda</p>
         </div>
 
         <div class="demo-info">
-            <strong>Demo Accounts:</strong>
+            <strong>Akaun Demo:</strong>
             Admin: admin@example.com / admin123<br>
-            User: john@example.com / password123
+            Pengguna: john@example.com / password123
         </div>
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="your@email.com">
+                <label for="email">Alamat E-mel</label>
+                <input type="email" id="email" required placeholder="anda@email.com">
             </div>
             
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+                <label for="password">Kata Laluan</label>
+                <input type="password" id="password" required placeholder="Masukkan kata laluan anda">
             </div>
             
             <div id="errorMessage" class="error-message"></div>
             
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn">Log Masuk</button>
         </form>
         
         <div class="auth-footer">
-            <p>Don't have an account? <a href="register.html">Register here</a></p>
+            <p>Tiada akaun? <a href="register.html">Daftar di sini</a></p>
         </div>
     </div>
 
     <script>
-        // Simple hash function for password comparison (matches our CSV hashed passwords)
+        // Fungsi hash ringkas untuk perbandingan kata laluan (padan dengan kata laluan dalam CSV)
         async function simpleHash(str) {
-            // For demo purposes - in production, use proper bcrypt comparison
-            return str; // We'll compare plain text for this static demo
+            // Untuk demo sahaja - dalam produksi, gunakan bcrypt atau kaedah yang selamat
+            return str; // Kita bandingkan teks biasa untuk demo statik ini
         }
 
-        // Load users from CSV
+        // Muat senarai pengguna dari CSV
         async function loadUsers() {
             try {
                 const response = await fetch('users.csv');
@@ -201,12 +204,12 @@
                     });
                 });
             } catch (error) {
-                console.error('Error loading users:', error);
+                console.error('Ralat memuat pengguna:', error);
                 return [];
             }
         }
 
-        // Handle login
+        // Pengendalian log masuk
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -218,32 +221,31 @@
             errorDiv.classList.remove('show');
             
             try {
-                // Load users from CSV
+                // Muat senarai pengguna dari CSV
                 const users = await loadUsers();
                 
-                // Find user by email
+                // Cari pengguna berdasarkan e-mel
                 const user = users.find(u => u.email === email);
                 
                 if (!user) {
-                    errorDiv.textContent = 'Invalid email or password';
+                    errorDiv.textContent = 'E-mel atau kata laluan tidak sah';
                     errorDiv.classList.add('show');
                     return;
                 }
                 
-                // For demo: Check if password matches plain text or is "password123" for all users
-                // In production, you'd need proper password hashing
+                // Untuk demo: Semak jika kata laluan sama dengan teks biasa atau nilai demo
                 const validPassword = password === user.password || 
                                     (email === 'admin@example.com' && password === 'admin123') ||
                                     (email === 'john@example.com' && password === 'password123') ||
                                     (email === 'jane@example.com' && password === 'password123');
                 
                 if (!validPassword) {
-                    errorDiv.textContent = 'Invalid email or password';
+                    errorDiv.textContent = 'E-mel atau kata laluan tidak sah';
                     errorDiv.classList.add('show');
                     return;
                 }
                 
-                // Store user session in localStorage
+                // Simpan sesi pengguna dalam localStorage
                 const userData = {
                     name: user.name,
                     email: user.email,
@@ -253,15 +255,16 @@
                 
                 localStorage.setItem('currentUser', JSON.stringify(userData));
                 
-                // Redirect to dashboard
+                // Alih ke papan pemuka
                 window.location.href = 'dashboard.html';
                 
             } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = 'Network error. Please make sure users.csv is in the same directory.';
+                console.error('Ralat log masuk:', error);
+                errorDiv.textContent = 'Ralat rangkaian. Sila pastikan fail users.csv berada dalam direktori yang sama.';
                 errorDiv.classList.add('show');
             }
         });
     </script>
 </body>
 </html>
+```
